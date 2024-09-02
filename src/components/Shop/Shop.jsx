@@ -7,7 +7,8 @@ import {
 import Cart from '../Cart/Cart';
 import Product from '../Product/Product';
 import './Shop.css';
-import {Link, useLoaderData} from 'react-router-dom';
+import {Link} from 'react-router-dom';
+import Pagination from '../Pagination/Pagination';
 
 /**
  * * Pagination steps :
@@ -26,21 +27,22 @@ import {Link, useLoaderData} from 'react-router-dom';
 const Shop = () => {
     const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([]);
-    const {count} = useLoaderData();
+    const [count, setCount] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
     const [productPerPage, setProductPerPage] = useState(9);
 
     const totalPage = Math.ceil(count / productPerPage);
-    //console.log('total pages', totalPage);
     const pages = [...Array(totalPage).keys()];
-    console.log(pages);
 
     useEffect(() => {
         fetch(
-            `http://localhost:5000/products?currentPage=${currentPage}&productPerPage=${productPerPage}`
+            `https://ema-john-pagination-server-starter-eight.vercel.app/products?currentPage=${currentPage}&productPerPage=${productPerPage}`
         )
             .then((res) => res.json())
-            .then((data) => setProducts(data));
+            .then((data) => {
+                setCount(data.totalProducts);
+                setProducts(data.products);
+            });
     }, [currentPage, productPerPage]);
 
     useEffect(() => {
@@ -88,12 +90,6 @@ const Shop = () => {
         deleteShoppingCart();
     };
 
-    //handle page setup
-    const handlePerPage = (e) => {
-        setProductPerPage(e.target.value);
-        setCurrentPage(0);
-    };
-
     return (
         <section>
             <div className="shop-container">
@@ -108,42 +104,13 @@ const Shop = () => {
                     </div>
 
                     {/* Pagination */}
-                    <div className="flex justify-center m-5 gap-3">
-                        <p>current page: {currentPage}</p>
-                        <button
-                            onClick={() => setCurrentPage(currentPage - 1)}
-                            disabled={currentPage == 0}
-                            className="bg-orange-600 text-white border-none">
-                            prev
-                        </button>
-
-                        {pages.map((page) => (
-                            <button
-                                onClick={() => setCurrentPage(page)}
-                                key={page}
-                                className={
-                                    currentPage === page
-                                        ? 'bg-black text-white border-none'
-                                        : 'bg-orange-600 text-white border-none'
-                                }>
-                                {page + 1}
-                            </button>
-                        ))}
-
-                        <button
-                            onClick={() => setCurrentPage(currentPage + 1)}
-                            disabled={currentPage == pages.length - 1}
-                            className="bg-orange-600 text-white border-none">
-                            Next
-                        </button>
-                        <select
-                            onChange={handlePerPage}
-                            className="bg-gray-300 px-3 rounded-xl">
-                            <option value="9">9</option>
-                            <option value="15">15</option>
-                            <option value="21">21</option>
-                            <option value="42">42</option>
-                        </select>
+                    <div>
+                        <Pagination
+                            currentPage={currentPage}
+                            setCurrentPage={setCurrentPage}
+                            pages={pages}
+                            setProductPerPage={setProductPerPage}
+                        />
                     </div>
                 </div>
 

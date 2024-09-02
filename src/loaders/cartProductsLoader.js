@@ -1,7 +1,9 @@
-import { getShoppingCart } from "../utilities/fakedb";
+import {getShoppingCart} from '../utilities/fakedb';
 
 const cartProductsLoader = async () => {
-    const loadedProducts = await fetch('http://localhost:5000/products');
+    const loadedProducts = await fetch(
+        'https://ema-john-pagination-server-starter-eight.vercel.app/products'
+    );
     const products = await loadedProducts.json();
 
     // if cart data is in database, you have to use async await
@@ -10,7 +12,7 @@ const cartProductsLoader = async () => {
     const savedCart = [];
 
     for (const id in storedCart) {
-        const addedProduct = products.find(pd => pd._id === id);
+        const addedProduct = products.find((pd) => pd._id === id);
         if (addedProduct) {
             const quantity = storedCart[id];
             addedProduct.quantity = quantity;
@@ -24,6 +26,6 @@ const cartProductsLoader = async () => {
     // return { products, cart: savedCart }
 
     return savedCart;
-}
+};
 
 export default cartProductsLoader;
