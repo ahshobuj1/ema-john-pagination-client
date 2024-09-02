@@ -24,26 +24,38 @@ import Pagination from '../Pagination/Pagination';
  *
  */
 
+/**
+ *
+ *  * Sort Steps:
+ * 1. select option for sort
+ * 2. manage state for sorting like 'asc' and 'desc'
+ * 3. get Fetch API request with query parameters
+ * 4. On the backend: get query parameter and set condition
+ * 5. then sort()
+ *
+ */
+
 const Shop = () => {
     const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([]);
     const [count, setCount] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
     const [productPerPage, setProductPerPage] = useState(9);
+    const [sortOrder, setSortOrder] = useState('desc');
 
     const totalPage = Math.ceil(count / productPerPage);
     const pages = [...Array(totalPage).keys()];
 
     useEffect(() => {
         fetch(
-            `https://ema-john-pagination-server-starter-eight.vercel.app/products?currentPage=${currentPage}&productPerPage=${productPerPage}`
+            `https://ema-john-pagination-server-starter-eight.vercel.app/products?currentPage=${currentPage}&productPerPage=${productPerPage}&sortOrder=${sortOrder}`
         )
             .then((res) => res.json())
             .then((data) => {
                 setCount(data.totalProducts);
                 setProducts(data.products);
             });
-    }, [currentPage, productPerPage]);
+    }, [currentPage, productPerPage, sortOrder]);
 
     useEffect(() => {
         const storedCart = getShoppingCart();
@@ -90,11 +102,29 @@ const Shop = () => {
         deleteShoppingCart();
     };
 
+    //sort handle
+    const handleSortOrder = (e) => {
+        setSortOrder(e.target.value);
+        console.log(sortOrder);
+    };
+
     return (
         <section>
-            <div className="shop-container">
-                <div>
-                    <div className="products-container">
+            <div className="shop-container grid grid-cols-1 lg:grid-cols-4">
+                <div className="lg:col-span-3">
+                    {/* Sort */}
+                    <div>
+                        <select
+                            onChange={handleSortOrder}
+                            className="select select-bordered bg-violet-600 h-10 text-white">
+                            <option disabled selected>
+                                Sort by price
+                            </option>
+                            <option value="asc">Low to high</option>
+                            <option value="desc">High to low</option>
+                        </select>
+                    </div>
+                    <div className="products-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-11">
                         {products.map((product) => (
                             <Product
                                 key={product._id}
